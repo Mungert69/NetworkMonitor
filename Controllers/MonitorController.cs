@@ -30,5 +30,12 @@ namespace NetworkMonitor.Controllers
 
             return _monitorPingService.MonitorPingInfos;
         }
+
+        [HttpGet]
+        public IEnumerable<MonitorPingInfo> GetPingData()
+        {
+
+            return _monitorPingService.MonitorPingInfos;
+        }
     }
 }

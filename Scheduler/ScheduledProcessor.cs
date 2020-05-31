@@ -18,6 +18,10 @@ namespace ASPNETCoreScheduler.Scheduler
             _nextRun = _schedule.GetNextOccurrence(DateTime.Now);
         }
 
+        protected void updateSchedule(string newSchedule) {
+            _schedule = CrontabSchedule.Parse(newSchedule);
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             do

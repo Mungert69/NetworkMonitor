@@ -12,9 +12,13 @@ namespace NetworkMonitor.Utils
     public class PingIt
     {
         private MonitorPingInfo _monitorPingInfo;
-        public PingIt(MonitorPingInfo pingInfo)
+        private PingParams _pingParams;
+
+
+        public PingIt(MonitorPingInfo pingInfo, PingParams pingParams)
         {
             _monitorPingInfo = pingInfo;
+            _pingParams = pingParams;
             pingInfo.PacketsSent++;
            
         }
@@ -31,12 +35,14 @@ namespace NetworkMonitor.Utils
             // the PingCompletedCallback method is called.
             pingSender.PingCompleted += new PingCompletedEventHandler(PingCompletedCallback);
 
-            // Create a buffer of 32 bytes of data to be transmitted.
-            string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            byte[] buffer = Encoding.ASCII.GetBytes(data);
+            // Create a buffer of x bytes of data to be transmitted.
+
+            byte[] buffer = new byte[_pingParams.BufferLength];
+            new Random().NextBytes(buffer);
+          
 
             // Wait 5 seconds for a reply.
-            int timeout = 5000;
+            int timeout = _pingParams.TimeOut;
 
             // Set options for transmission:
             // The data can go through 64 gateways or routers
@@ -53,7 +59,6 @@ namespace NetworkMonitor.Utils
             // A real application should do something useful
             // when possible.
             waiter.WaitOne();
-            Console.WriteLine("Ping example completed.");
         }
 
         private  void PingCompletedCallback(object sender, PingCompletedEventArgs e)
