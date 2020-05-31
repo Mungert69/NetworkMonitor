@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,7 +8,7 @@ namespace NetworkMonitor.Objects
 {
     public class MonitorPingInfo
     {
-
+        [Key]public int ID { get; set; }
         private DateTime dateStarted = DateTime.Now;
         private int roundTripTimeMinimum = 999;
 

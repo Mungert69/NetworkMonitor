@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NetworkMonitor.Data;
 
 namespace NetworkMonitor
 {
@@ -29,7 +30,8 @@ namespace NetworkMonitor
                 IServiceProvider services = scope.ServiceProvider;
                 try
                 {
-                    // Add EF context here.
+                    MonitorContext context = services.GetRequiredService<MonitorContext>();
+                    DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)
                 {

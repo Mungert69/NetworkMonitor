@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NetworkMonitor.Data;
 using NetworkMonitor.Objects;
 
 namespace NetworkMonitor
@@ -29,6 +31,9 @@ namespace NetworkMonitor
         {
             services.AddSingleton<IHostedService, PingScheduleTask>();
             services.AddSingleton<IMonitorPingService, MonitorPingService>();
+            services.AddDbContext<MonitorContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAnyOrigin",
