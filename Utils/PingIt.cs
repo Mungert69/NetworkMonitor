@@ -95,18 +95,18 @@ namespace NetworkMonitor.Utils
         {
             if (reply == null)
                 return;
+            PingInfo pingInfo = new PingInfo();
+            pingInfo.DateSent = DateTime.Now;
+            pingInfo.Status = reply.Status.ToString();
 
             _monitorPingInfo.Status = reply.Status.ToString() ;
             if (reply.Status == IPStatus.Success)
             {
                 _monitorPingInfo.PacketsRecieved++;
-                int roundTripTime = (int)reply.RoundtripTime;
-                PingInfo pingInfo = new PingInfo();
+                int roundTripTime = (int)reply.RoundtripTime;               
                 pingInfo.RoundTripTime = roundTripTime;
-                pingInfo.Status = reply.Status.ToString();
-
-                _monitorPingInfo.pingInfos.Add(pingInfo);
-                //_pingInfo.RoundTripTime = roundTripTime;
+                
+              
                 if (_monitorPingInfo.RoundTripTimeMaximum < roundTripTime) _monitorPingInfo.RoundTripTimeMaximum = roundTripTime;
                 if (_monitorPingInfo.RoundTripTimeMinimum > roundTripTime) _monitorPingInfo.RoundTripTimeMinimum = roundTripTime;
                 _monitorPingInfo.RoundTripTimeTotal += roundTripTime;
@@ -118,6 +118,8 @@ namespace NetworkMonitor.Utils
             _monitorPingInfo.PacketsLostPercentage = (float)_monitorPingInfo.PacketsLost * (float)100 / (float)_monitorPingInfo.PacketsSent;
             if (reply.Status == IPStatus.TimedOut) _monitorPingInfo.TimeOuts++;
             if (reply.Status == IPStatus.DestinationHostUnreachable) _monitorPingInfo.DestinationUnreachable++;
+            pingInfo.RoundTripTime = _pingParams.TimeOut;
+            _monitorPingInfo.pingInfos.Add(pingInfo);
 
 
         }

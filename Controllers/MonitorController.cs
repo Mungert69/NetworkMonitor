@@ -28,11 +28,75 @@ namespace NetworkMonitor.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<MonitorPingInfo> Get()
+        public ActionResult<ResultObj> Get()
+        {
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            try {
+                result.Data = _monitorPingService.MonitorPingInfos;
+                result.Success = true;
+                result.Message = "Success got MonitorPingInfos";
+                return result;
+            }
+            catch (Exception e) {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to get MonitorPingInfos : Error was : " + e.Message;
+                return result;
+
+            }
+            
+        }
+
+        [HttpGet("GetMointorPingInfosByDataSetID/{dataSetId}")]
+        public ActionResult<ResultObj> GetMointorPingInfosByDataSetID([FromRoute] int dataSetId)
         {
 
-            return _monitorPingService.MonitorPingInfos;
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            try
+            {
+                result.Data = _monitorContext.MonitorPingInfos.Where(m => m.DataSetID==dataSetId).ToList();
+                result.Success = true;
+                result.Message = "Success got MonitorPingInfos for DataSetID "+dataSetId;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to get MonitorPingInfos for DataSetID " + dataSetId+" : Error was : " + e.Message;
+                return result;
+
+            }
         }
+
+
+        [HttpGet("GetPingInfosByMonitorPingInfoID/{monitorPingInfoId}")]
+        public ActionResult<ResultObj> GetPingInfosByMonitorPingInfoID([FromRoute] int monitorPingInfoId)
+        {
+
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            try
+            {
+                result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).ToList();
+                result.Success = true;
+                result.Message = "Success got PingInfos for MontiorPingInfoId " + monitorPingInfoId;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to get PingInfos for MontiorPingInfoId " + monitorPingInfoId + " : Error was : " + e.Message;
+                return result;
+
+            }
+        }
+
+
+      
 
         [HttpGet("SaveData")]
         public ActionResult<ResultObj> SaveData() {
