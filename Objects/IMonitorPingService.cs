@@ -6,5 +6,8 @@ namespace NetworkMonitor.Objects
     {
         List<MonitorPingInfo> MonitorPingInfos { get; set; }
         PingParams PingParams { get; set; }
+        bool RequestInit { get; set; }
+
+        void init();
     }
 }

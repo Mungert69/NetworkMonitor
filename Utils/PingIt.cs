@@ -103,6 +103,7 @@ namespace NetworkMonitor.Utils
                 int roundTripTime = (int)reply.RoundtripTime;
                 PingInfo pingInfo = new PingInfo();
                 pingInfo.RoundTripTime = roundTripTime;
+                pingInfo.Status = reply.Status.ToString();
 
                 _monitorPingInfo.pingInfos.Add(pingInfo);
                 //_pingInfo.RoundTripTime = roundTripTime;
@@ -114,6 +115,7 @@ namespace NetworkMonitor.Utils
             else { 
                 _monitorPingInfo.PacketsLost++;
             }
+            _monitorPingInfo.PacketsLostPercentage = (float)_monitorPingInfo.PacketsLost * (float)100 / (float)_monitorPingInfo.PacketsSent;
             if (reply.Status == IPStatus.TimedOut) _monitorPingInfo.TimeOuts++;
             if (reply.Status == IPStatus.DestinationHostUnreachable) _monitorPingInfo.DestinationUnreachable++;
 

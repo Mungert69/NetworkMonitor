@@ -11,8 +11,8 @@ namespace NetworkMonitor.Data
         {
         }
 
-        public DbSet<MonitorPingInfo> Users { get; set; }
-        public DbSet<PingInfo> Holidays { get; set; }
+        public DbSet<MonitorPingInfo> MonitorPingInfos{ get; set; }
+        public DbSet<PingInfo> PingInfos { get; set; }
 
       
         protected override void OnModelCreating(ModelBuilder modelBuilder)

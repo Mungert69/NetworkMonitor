@@ -12,6 +12,8 @@ namespace NetworkMonitor.Objects
         private DateTime dateStarted = DateTime.Now;
         private int roundTripTimeMinimum = 999;
 
+        public int DataSetID { get; set; }
+
         public List<PingInfo> pingInfos = new List<PingInfo>();
         public string Status { get; set; }
         public int DestinationUnreachable { get; set; }
@@ -20,7 +22,7 @@ namespace NetworkMonitor.Objects
         public string IPAddress { get; set; }
         public int PacketsRecieved { get; set; }
         public int PacketsLost { get; set; }
-        public int PacketsLostPercentage { get; set; }
+        public float PacketsLostPercentage { get; set; }
        
         public int RoundTripTimeMaximum { get; set; }
         public float RoundTripTimeAverage { get; set; }
