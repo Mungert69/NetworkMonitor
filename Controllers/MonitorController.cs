@@ -153,59 +153,8 @@ namespace NetworkMonitor.Controllers
 
         [HttpGet("SaveData")]
         public ActionResult<ResultObj> SaveData() {
-            ResultObj result = new ResultObj();
-            result.Success = false;
-            if (_monitorPingService.RequestInit == true) {
-                result.Message = "Can not save data an Initialse MonitorPingService is pending. Try again after next ping schedule.";
-                return result;
-            }
-            try {
-                int maxDataSetID = 0;
-                try { maxDataSetID = _monitorContext.MonitorPingInfos.Max(m => m.DataSetID); }
-                catch { }
-                   
-               
-                maxDataSetID++;
-                foreach (MonitorPingInfo monitorPingInfo in _monitorPingService.MonitorPingInfos)
-                {
-                    monitorPingInfo.ID = 0;
-                    monitorPingInfo.DataSetID = maxDataSetID;
-                    _monitorContext.Add(monitorPingInfo);
-                }
-                _monitorContext.SaveChanges();
-
-                int i = 0;
-                foreach (MonitorPingInfo monitorPingInfo in _monitorContext.MonitorPingInfos.Where(m => m.DataSetID==maxDataSetID).ToList()) {
-                    _monitorPingService.MonitorPingInfos[i].ID = monitorPingInfo.ID;
-                    i++;
-                }
-
-                List<MonitorPingInfo> monitorPingInfos = new List<MonitorPingInfo>(_monitorPingService.MonitorPingInfos);
-                 foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos)
-                {
-                    foreach (PingInfo pingInfo in monitorPingInfo.pingInfos) {
-                        pingInfo.MonitorPingInfoID = monitorPingInfo.ID;
-                        pingInfo.ID = 0;
-                        _monitorContext.Add(pingInfo);
-
-                    }                  
-                }
-
-                _monitorContext.SaveChanges();
-                // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
-                _monitorPingService.RequestInit=true ;
-
-                
-
-                result.Message="DB Update Success in /SaveData.";
-                result.Success = true;
-            } 
-            catch (Exception e) {
-                result.Message = "DB Update Failed in /SaveData. Error was : "+e.Message;
-            }
-
-            
-            return result;
+            return _monitorPingService.SaveData(_monitorContext);
+           
         }
 
     }

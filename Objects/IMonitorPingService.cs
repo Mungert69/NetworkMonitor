@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NetworkMonitor.Data;
+using System.Collections.Generic;
 
 namespace NetworkMonitor.Objects
 {
@@ -9,5 +10,6 @@ namespace NetworkMonitor.Objects
         bool RequestInit { get; set; }
 
         void init();
+        ResultObj SaveData(MonitorContext monitorContext);
     }
 }

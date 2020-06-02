@@ -6,7 +6,7 @@ namespace NetworkMonitor.Data
 {
     public class MonitorContext : DbContext
     {
-
+      
         public MonitorContext(DbContextOptions<MonitorContext> options) : base(options)
         {
         }
