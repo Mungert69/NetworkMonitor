@@ -118,8 +118,6 @@ namespace NetworkMonitor.Controllers
         }
 
 
-
-
         [HttpGet("GetPingInfosByMonitorPingInfoID/{monitorPingInfoId}/{dataSetId}")]
         public ActionResult<ResultObj> GetPingInfosByMonitorPingInfoID([FromRoute] int monitorPingInfoId, [FromRoute] int dataSetId)
         {
