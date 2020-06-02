@@ -24,7 +24,7 @@ namespace ASPNETCoreScheduler.Scheduler
         {
         }
 
-        protected override string Schedule => "* */2 * * *";
+        protected override string Schedule => "* * */2 * *";
 
         public override Task ProcessInScope(IServiceProvider serviceProvider)
         {
