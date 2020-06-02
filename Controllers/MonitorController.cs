@@ -127,14 +127,13 @@ namespace NetworkMonitor.Controllers
             try
             {
                 if (dataSetId == 0) {
-                    result.Data = _monitorPingService.MonitorPingInfos.Where(m => m.ID == monitorPingInfoId).FirstOrDefault().pingInfos;
+                    result.Data = _monitorPingService.MonitorPingInfos.Where(m => m.ID == monitorPingInfoId).FirstOrDefault().pingInfos.OrderBy(o => o.DateSent).ToList();
                 }
                 else {
                     result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).OrderBy(o => o.DateSent).ToList();
 
                 }
-                result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).OrderBy(o => o.DateSent).ToList();
-                result.Success = true;
+                 result.Success = true;
                 result.Message = "Success got PingInfos for MontiorPingInfoId " + monitorPingInfoId;
                 return result;
             }
