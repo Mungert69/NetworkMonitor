@@ -38,8 +38,9 @@ namespace NetworkMonitor.Objects
             string[] monitorIPs = _config.GetSection("MonitorIps").GetChildren().ToArray().Select(c => c.Value).ToArray();
             MonitorPingInfo monitorPingInfo;
             for (int i = 0; i < monitorIPs.Length; i++)
-            {
+            {               
                 monitorPingInfo = new MonitorPingInfo();
+                monitorPingInfo.ID = i + 1;
                 monitorPingInfo.IPAddress = monitorIPs[i];
                 _monitorPingInfos.Add(monitorPingInfo);
             }
