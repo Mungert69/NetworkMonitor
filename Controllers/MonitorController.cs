@@ -72,6 +72,43 @@ namespace NetworkMonitor.Controllers
         }
 
 
+        [HttpGet("GetDataSets/{dataSetId}")]
+        public ActionResult<ResultObj> GetDataSets([FromRoute] int dataSetId)
+        {
+
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            try
+            {
+                List<MonitorPingInfo> monitorPingInfos= _monitorContext.MonitorPingInfos.ToList();
+                List<DataSetObj> dataSets = new List<DataSetObj>();
+                DataSetObj dataSet;
+                foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos) {
+                    dataSet = new DataSetObj();
+                    dataSet.DataSetId = monitorPingInfo.DataSetID;
+                    dataSet.DateStarted = monitorPingInfo.DateStarted;
+                    if (dataSets.Where(d => d.DataSetId == dataSetId).ToList().Count() == 0) {
+                        dataSets.Add(dataSet);
+                    }
+                    
+                }
+
+                result.Data = dataSets;
+                result.Success = true;
+                result.Message = "Success got MonitorPingInfos for DataSetID " + dataSetId;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to get MonitorPingInfos for DataSetID " + dataSetId + " : Error was : " + e.Message;
+                return result;
+
+            }
+        }
+
+
         [HttpGet("GetPingInfosByMonitorPingInfoID/{monitorPingInfoId}")]
         public ActionResult<ResultObj> GetPingInfosByMonitorPingInfoID([FromRoute] int monitorPingInfoId)
         {
@@ -80,7 +117,7 @@ namespace NetworkMonitor.Controllers
             result.Success = false;
             try
             {
-                result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).ToList();
+                result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).OrderBy(o => o.DateSent).ToList();
                 result.Success = true;
                 result.Message = "Success got PingInfos for MontiorPingInfoId " + monitorPingInfoId;
                 return result;

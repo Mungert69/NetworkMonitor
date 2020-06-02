@@ -114,11 +114,12 @@ namespace NetworkMonitor.Utils
             }
             else { 
                 _monitorPingInfo.PacketsLost++;
+                pingInfo.RoundTripTime = _pingParams.TimeOut;
             }
             _monitorPingInfo.PacketsLostPercentage = (float)_monitorPingInfo.PacketsLost * (float)100 / (float)_monitorPingInfo.PacketsSent;
             if (reply.Status == IPStatus.TimedOut) _monitorPingInfo.TimeOuts++;
             if (reply.Status == IPStatus.DestinationHostUnreachable) _monitorPingInfo.DestinationUnreachable++;
-            pingInfo.RoundTripTime = _pingParams.TimeOut;
+            
             _monitorPingInfo.pingInfos.Add(pingInfo);
 
 
