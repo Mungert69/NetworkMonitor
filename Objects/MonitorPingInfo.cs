@@ -9,13 +9,14 @@ namespace NetworkMonitor.Objects
     public class MonitorPingInfo
     {
         [Key]public int ID { get; set; }
-        private DateTime dateStarted = DateTime.Now;
-        private int roundTripTimeMinimum = 999;
-
+        private DateTime _dateStarted = DateTime.Now;
+        private int _roundTripTimeMinimum = 999;
+        private StatusObj _monitorStatus=new StatusObj();
         public int DataSetID { get; set; }
 
-        public List<PingInfo> pingInfos = new List<PingInfo>();
-        public string Status { get; set; }
+        public List<PingInfo> pingInfos = new List<PingInfo>();   
+        
+        public string Status { get => _monitorStatus.Message; set => _monitorStatus.Message = value; }
         public int DestinationUnreachable { get; set; }
         public int TimeOuts { get; set; }
 
@@ -30,7 +31,8 @@ namespace NetworkMonitor.Objects
         public int RoundTripTimeTotal { get; set; }
 
         public int PacketsSent { get; internal set; }
-        public DateTime DateStarted { get => dateStarted; set => dateStarted = value; }
-        public int RoundTripTimeMinimum { get => roundTripTimeMinimum; set => roundTripTimeMinimum = value; }
+        public DateTime DateStarted { get => _dateStarted; set => _dateStarted = value; }
+        public int RoundTripTimeMinimum { get => _roundTripTimeMinimum; set => _roundTripTimeMinimum = value; }
+        public StatusObj MonitorStatus { get => _monitorStatus; set => _monitorStatus = value; }
     }
 }

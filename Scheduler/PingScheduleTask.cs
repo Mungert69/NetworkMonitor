@@ -44,7 +44,7 @@ namespace ASPNETCoreScheduler.Scheduler
                         pingIt = new PingIt(monitorPingInfo, pingParams);
                         pingIt.go();
                         Console.WriteLine("IP Address : " + monitorPingInfo.IPAddress);
-                        Console.WriteLine("Status : " + monitorPingInfo.Status);
+                        Console.WriteLine("Status : " + monitorPingInfo.MonitorStatus);
                         Console.WriteLine("Trip Time : " + monitorPingInfo.RoundTripTimeAverage);
                     }
                     Thread.Sleep(pingParams.PingBurstDelay);

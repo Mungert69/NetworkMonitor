@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
@@ -147,8 +146,34 @@ namespace NetworkMonitor.Controllers
             }
         }
 
+        [HttpGet("ResetAlert/{monitorPingInfoId}")]
+        public ActionResult<ResultObj> ResetAlert([FromRoute] int monitorPingInfoId)
+        {
 
-      
+            ResultObj result = new ResultObj();
+           
+            result.Success = false;
+            try
+            {
+                _monitorPingService.MonitorPingInfos.Where(m => m.ID == monitorPingInfoId).FirstOrDefault().MonitorStatus.AlertFlag = false;
+                _monitorPingService.MonitorPingInfos.Where(m => m.ID == monitorPingInfoId).FirstOrDefault().MonitorStatus.AlertSent = false;
+                result.Data = null;
+                result.Success = true;
+                result.Message = "Success reset alert for MontiorPingInfoId " + monitorPingInfoId;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to reset alert for MontiorPingInfoId " + monitorPingInfoId + " : Error was : " + e.Message;
+                return result;
+
+            }
+        }
+
+
+
 
         [HttpGet("SaveData")]
         public ActionResult<ResultObj> SaveData() {

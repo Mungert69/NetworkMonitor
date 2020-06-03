@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using NetworkMonitor.Data;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace NetworkMonitor.Objects
@@ -13,15 +16,21 @@ namespace NetworkMonitor.Objects
         private readonly IConfiguration _config;
         private PingParams _pingParams;
         private bool _requestInit = false;
+        private IWebHostEnvironment _env = null;
+        private string _publicIPAddress;
+        private int _pingAlertThreshold;
 
 
 
         private List<MonitorPingInfo> _monitorPingInfos;
+        private IMessageService _mailMessageService;
 
-        public MonitorPingService(IConfiguration config)
+        public MonitorPingService(IConfiguration config, IMessageService mailMessageService,IWebHostEnvironment webHostEnv)
         {
             _config = config;
-
+            _mailMessageService = mailMessageService;
+            _env = webHostEnv;
+            _publicIPAddress = GetPublicIP();
             init();
 
         }
@@ -37,6 +46,8 @@ namespace NetworkMonitor.Objects
             _pingParams.PingBurstDelay = _config.GetValue<int>("PingBurstDelay");
             _pingParams.PingBurstNumber = _config.GetValue<int>("PingBurstNumber");
             _pingParams.Schedule = _config.GetValue<string>("PingSchedule");
+            _pingAlertThreshold = _config.GetValue<int>("PingAlertThreshold");
+            
             string[] monitorIPs = _config.GetSection("MonitorIps").GetChildren().ToArray().Select(c => c.Value).ToArray();
             MonitorPingInfo monitorPingInfo;
             for (int i = 0; i < monitorIPs.Length; i++)
@@ -46,9 +57,60 @@ namespace NetworkMonitor.Objects
                 monitorPingInfo.IPAddress = monitorIPs[i];
                 _monitorPingInfos.Add(monitorPingInfo);
             }
+
+
             _requestInit = false;
         }
 
+        public static string GetPublicIP()
+        {
+            string myPublicIp = "";
+            WebRequest request = WebRequest.Create("https://api.ipify.org/");
+            using (WebResponse response = request.GetResponse())
+            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            {
+                myPublicIp = stream.ReadToEnd();
+            }
+            return myPublicIp;
+        }
+
+        public ResultObj Alert()
+        {
+            ResultObj result = new ResultObj();
+            bool alert = false;
+            string alertMessage = "Message from host : "+_publicIPAddress+"\n";
+            foreach (MonitorPingInfo monPingInfo in _monitorPingInfos)
+            {
+                if (monPingInfo.MonitorStatus.DownCount > _pingAlertThreshold && monPingInfo.MonitorStatus.AlertSent == false)
+                {
+                    alertMessage += "\nNode ping down " + monPingInfo.MonitorStatus.DownCount +
+                        " times. For IP address " + monPingInfo.IPAddress+ " Time : "+ monPingInfo.MonitorStatus.EventTime;
+                    alert = true;
+                    monPingInfo.MonitorStatus.AlertFlag = true;
+                }
+            }
+            if (alert)
+            {
+                _mailMessageService.setWebEnv(_env);
+                //_mailMessageService.init();
+                if (_mailMessageService.send(alertMessage).Success)
+                {
+                    // reset alerts
+                    foreach (MonitorPingInfo monPingInfo in _monitorPingInfos)
+                    {
+                        if (monPingInfo.MonitorStatus.DownCount > 1)
+                        {
+                            monPingInfo.MonitorStatus.AlertSent = true;
+                        }
+                    }
+
+                }
+
+            }
+            
+
+            return result;
+        }
 
         public ResultObj SaveData(MonitorContext monitorContext)
         {

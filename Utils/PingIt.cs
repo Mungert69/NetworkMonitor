@@ -66,7 +66,10 @@ namespace NetworkMonitor.Utils
             // If the operation was canceled, display a message to the user.
             if (e.Cancelled)
             {
-                _monitorPingInfo.Status = "Ping canceled.";
+                _monitorPingInfo.MonitorStatus.Message = "Ping canceled.";
+                _monitorPingInfo.MonitorStatus.IsUp = false;
+                _monitorPingInfo.MonitorStatus.DownCount++;
+                _monitorPingInfo.MonitorStatus.EventTime = DateTime.Now;
                 _monitorPingInfo.PacketsLost++;
                 // Let the main thread resume.
                 // UserToken is the AutoResetEvent object that the main thread
@@ -77,7 +80,10 @@ namespace NetworkMonitor.Utils
             // If an error occurred, display the exception to the user.
             if (e.Error != null)
             {
-                _monitorPingInfo.Status = "Ping failed:"+ e.Error.ToString();
+                _monitorPingInfo.MonitorStatus.Message = "Ping failed:"+ e.Error.ToString();
+                _monitorPingInfo.MonitorStatus.IsUp = false;
+                _monitorPingInfo.MonitorStatus.DownCount++;
+                _monitorPingInfo.MonitorStatus.EventTime = DateTime.Now;
                 _monitorPingInfo.PacketsLost++;
                 // Let the main thread resume.
                 ((AutoResetEvent)e.UserState).Set();
@@ -99,14 +105,17 @@ namespace NetworkMonitor.Utils
             pingInfo.DateSent = DateTime.Now;
             pingInfo.Status = reply.Status.ToString();
 
-            _monitorPingInfo.Status = reply.Status.ToString() ;
+            _monitorPingInfo.MonitorStatus.Message = reply.Status.ToString() ;
             if (reply.Status == IPStatus.Success)
             {
                 _monitorPingInfo.PacketsRecieved++;
                 int roundTripTime = (int)reply.RoundtripTime;               
                 pingInfo.RoundTripTime = roundTripTime;
-                
-              
+                _monitorPingInfo.MonitorStatus.IsUp = true;
+                _monitorPingInfo.MonitorStatus.DownCount=0;
+
+
+
                 if (_monitorPingInfo.RoundTripTimeMaximum < roundTripTime) _monitorPingInfo.RoundTripTimeMaximum = roundTripTime;
                 if (_monitorPingInfo.RoundTripTimeMinimum > roundTripTime) _monitorPingInfo.RoundTripTimeMinimum = roundTripTime;
                 _monitorPingInfo.RoundTripTimeTotal += roundTripTime;
@@ -114,6 +123,9 @@ namespace NetworkMonitor.Utils
             }
             else { 
                 _monitorPingInfo.PacketsLost++;
+                _monitorPingInfo.MonitorStatus.IsUp = false;
+                _monitorPingInfo.MonitorStatus.DownCount++;
+                _monitorPingInfo.MonitorStatus.EventTime = pingInfo.DateSent;
                 pingInfo.RoundTripTime = -20;
             }
             _monitorPingInfo.PacketsLostPercentage = (float)_monitorPingInfo.PacketsLost * (float)100 / (float)_monitorPingInfo.PacketsSent;

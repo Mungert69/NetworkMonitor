@@ -31,7 +31,9 @@ namespace NetworkMonitor
         {
             services.AddSingleton<IHostedService, PingScheduleTask>();
             services.AddSingleton<IHostedService, SaveScheduleTask>();
+            services.AddSingleton<IHostedService, AlertScheduleTask>();
             services.AddSingleton<IMonitorPingService, MonitorPingService>();
+            services.AddSingleton<IMessageService, MailMessageService>();
             services.AddDbContext<MonitorContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 

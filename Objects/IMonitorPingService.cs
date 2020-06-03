@@ -9,6 +9,7 @@ namespace NetworkMonitor.Objects
         PingParams PingParams { get; set; }
         bool RequestInit { get; set; }
 
+        ResultObj Alert();
         void init();
         ResultObj SaveData(MonitorContext monitorContext);
     }
