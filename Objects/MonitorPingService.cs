@@ -19,27 +19,29 @@ namespace NetworkMonitor.Objects
         private IWebHostEnvironment _env = null;
         private string _publicIPAddress;
         private int _pingAlertThreshold;
+        private string[] _monitorIPs;
 
 
 
-        private List<MonitorPingInfo> _monitorPingInfos;
+        private List<MonitorPingInfo> _monitorPingInfos = null;
         private IMessageService _mailMessageService;
 
-        public MonitorPingService(IConfiguration config, IMessageService mailMessageService,IWebHostEnvironment webHostEnv)
+        public MonitorPingService(IConfiguration config, IMessageService mailMessageService, IWebHostEnvironment webHostEnv)
         {
             _config = config;
             _mailMessageService = mailMessageService;
             _env = webHostEnv;
             _publicIPAddress = GetPublicIP();
-            init();
+            init(true);
 
         }
 
 
-        public void init()
+        public void init(bool initMonitorPingInfos)
         {
             _pingParams = new PingParams();
-            _monitorPingInfos = new List<MonitorPingInfo>();
+
+
 
             _pingParams.BufferLength = _config.GetValue<int>("PingPacketSize");
             _pingParams.TimeOut = _config.GetValue<int>("PingTimeOut");
@@ -47,16 +49,47 @@ namespace NetworkMonitor.Objects
             _pingParams.PingBurstNumber = _config.GetValue<int>("PingBurstNumber");
             _pingParams.Schedule = _config.GetValue<string>("PingSchedule");
             _pingAlertThreshold = _config.GetValue<int>("PingAlertThreshold");
-            
-            string[] monitorIPs = _config.GetSection("MonitorIps").GetChildren().ToArray().Select(c => c.Value).ToArray();
-            MonitorPingInfo monitorPingInfo;
-            for (int i = 0; i < monitorIPs.Length; i++)
+
+
+            if (initMonitorPingInfos)
             {
-                monitorPingInfo = new MonitorPingInfo();
-                monitorPingInfo.ID = i + 1;
-                monitorPingInfo.IPAddress = monitorIPs[i];
-                _monitorPingInfos.Add(monitorPingInfo);
+                // init fully on first run.
+                _monitorPingInfos = new List<MonitorPingInfo>();
+                _monitorIPs = _config.GetSection("MonitorIps").GetChildren().ToArray().Select(c => c.Value).ToArray();
+                MonitorPingInfo monitorPingInfo;
+                for (int i = 0; i < _monitorIPs.Length; i++)
+                {
+                    monitorPingInfo = new MonitorPingInfo();
+                    monitorPingInfo.ID = i + 1;
+                    monitorPingInfo.IPAddress = _monitorIPs[i];
+                    _monitorPingInfos.Add(monitorPingInfo);
+                }
+
             }
+            else
+            {
+                List<MonitorPingInfo> newMonPingInfos = new List<MonitorPingInfo>();
+                MonitorPingInfo newMonPingInfo;
+                StatusObj status;
+                int i = 0;
+                // Copy Alert status before init.
+                foreach (MonitorPingInfo monPingInfo in _monitorPingInfos)
+                {
+                    status = new StatusObj();
+                    status.AlertFlag = monPingInfo.MonitorStatus.AlertFlag;
+                    status.AlertSent = monPingInfo.MonitorStatus.AlertSent;
+                    status.DownCount = monPingInfo.MonitorStatus.DownCount;
+                    status.IsUp = monPingInfo.MonitorStatus.IsUp;
+                    newMonPingInfo = new MonitorPingInfo();
+                    newMonPingInfo.ID = i + 1;
+                    newMonPingInfo.IPAddress = _monitorIPs[i];
+                    newMonPingInfo.MonitorStatus = status;
+                    newMonPingInfos.Add(newMonPingInfo);
+                    i++;
+                }
+                _monitorPingInfos = new List<MonitorPingInfo>(newMonPingInfos);
+            }
+
 
 
             _requestInit = false;
@@ -78,13 +111,13 @@ namespace NetworkMonitor.Objects
         {
             ResultObj result = new ResultObj();
             bool alert = false;
-            string alertMessage = "Message from host : "+_publicIPAddress+"\n";
+            string alertMessage = "Message from host : " + _publicIPAddress + "\n";
             foreach (MonitorPingInfo monPingInfo in _monitorPingInfos)
             {
                 if (monPingInfo.MonitorStatus.DownCount > _pingAlertThreshold && monPingInfo.MonitorStatus.AlertSent == false)
                 {
                     alertMessage += "\nNode ping down " + monPingInfo.MonitorStatus.DownCount +
-                        " times. For IP address " + monPingInfo.IPAddress+ " Time : "+ monPingInfo.MonitorStatus.EventTime;
+                        " times. For IP address " + monPingInfo.IPAddress + " Time : " + monPingInfo.MonitorStatus.EventTime;
                     alert = true;
                     monPingInfo.MonitorStatus.AlertFlag = true;
                 }
@@ -107,7 +140,7 @@ namespace NetworkMonitor.Objects
                 }
 
             }
-            
+
 
             return result;
         }

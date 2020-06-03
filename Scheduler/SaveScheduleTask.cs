@@ -24,7 +24,7 @@ namespace ASPNETCoreScheduler.Scheduler
         {
         }
 
-        protected override string Schedule => "0 */2 * * *";
+        protected override string Schedule => "0 */3 * * *";
 
         public override Task ProcessInScope(IServiceProvider serviceProvider)
         {
@@ -39,7 +39,7 @@ namespace ASPNETCoreScheduler.Scheduler
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error occured in SaveScheduleTask.ProcesInScope() : " + e.Message);
+                Console.WriteLine("Error occured in SaveScheduleTask.ProcesInScope() : " + e.Message+"\n");
             }
             Console.WriteLine("Saving data processing ends here");
             return Task.CompletedTask;

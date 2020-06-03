@@ -10,7 +10,7 @@ namespace NetworkMonitor.Objects
         bool RequestInit { get; set; }
 
         ResultObj Alert();
-        void init();
+        void init(bool initMonitorPingInfos);
         ResultObj SaveData(MonitorContext monitorContext);
     }
 }

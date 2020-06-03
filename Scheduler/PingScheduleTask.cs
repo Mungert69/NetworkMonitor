@@ -27,11 +27,11 @@ namespace ASPNETCoreScheduler.Scheduler
 
         public override Task ProcessInScope(IServiceProvider serviceProvider)
         {
-            Console.WriteLine("Processing starts here");
+            //Console.WriteLine("Processing starts here");
             try {
                 // Update schedule with string from appsettings.json
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
-                if (_monitorPingService.RequestInit) { _monitorPingService.init(); }
+                if (_monitorPingService.RequestInit) { _monitorPingService.init(false); }
                 updateSchedule(_monitorPingService.PingParams.Schedule);
                 PingParams pingParams = _monitorPingService.PingParams;
                 PingIt pingIt;
@@ -43,9 +43,9 @@ namespace ASPNETCoreScheduler.Scheduler
                     {
                         pingIt = new PingIt(monitorPingInfo, pingParams);
                         pingIt.go();
-                        Console.WriteLine("IP Address : " + monitorPingInfo.IPAddress);
-                        Console.WriteLine("Status : " + monitorPingInfo.MonitorStatus);
-                        Console.WriteLine("Trip Time : " + monitorPingInfo.RoundTripTimeAverage);
+                        //Console.WriteLine("IP Address : " + monitorPingInfo.IPAddress);
+                        //Console.WriteLine("Status : " + monitorPingInfo.MonitorStatus);
+                        //Console.WriteLine("Trip Time : " + monitorPingInfo.RoundTripTimeAverage);
                     }
                     Thread.Sleep(pingParams.PingBurstDelay);
                 }
@@ -55,7 +55,7 @@ namespace ASPNETCoreScheduler.Scheduler
             catch (Exception e) {
                 Console.WriteLine("Error occured in PingScheduleTask.ProcesInScope() : "+e.Message);
             }
-            Console.WriteLine("Processing ends here");
+            //Console.WriteLine("Processing ends here");
             return Task.CompletedTask;
         }
 
