@@ -48,6 +48,8 @@ namespace NetworkMonitor.Objects
             _pingParams.PingBurstDelay = _config.GetValue<int>("PingBurstDelay");
             _pingParams.PingBurstNumber = _config.GetValue<int>("PingBurstNumber");
             _pingParams.Schedule = _config.GetValue<string>("PingSchedule");
+            _pingParams.SaveSchedule = _config.GetValue<string>("SaveSchedule");
+            _pingParams.AlertSchedule = _config.GetValue<string>("AlertSchedule");
             _pingAlertThreshold = _config.GetValue<int>("PingAlertThreshold");
 
 

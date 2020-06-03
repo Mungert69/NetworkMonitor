@@ -24,7 +24,7 @@ namespace ASPNETCoreScheduler.Scheduler
         {
         }
 
-        protected override string Schedule => "0 */3 * * *";
+        protected override string Schedule => "0 */1 * * *";
 
         public override Task ProcessInScope(IServiceProvider serviceProvider)
         {
@@ -34,6 +34,7 @@ namespace ASPNETCoreScheduler.Scheduler
                 // Update schedule with string from appsettings.json
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
                 MonitorContext monitorContext= serviceProvider.GetService<MonitorContext>();
+                updateSchedule(_monitorPingService.PingParams.SaveSchedule);
                 ResultObj result=_monitorPingService.SaveData(monitorContext);
                 Console.Write(result.Message);
             }
