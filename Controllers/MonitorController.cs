@@ -54,8 +54,8 @@ namespace NetworkMonitor.Controllers
             
         }
 
-        [HttpGet("GetNetStats")]
-        public ActionResult<ResultObj> GetNetStats()
+        [HttpGet("GetNetStats/{duration}")]
+        public ActionResult<ResultObj> GetNetStats([FromRoute] int duration)
         {
 
             ResultObj result = new ResultObj();
@@ -65,7 +65,7 @@ namespace NetworkMonitor.Controllers
               
                 _netStatsService.init(0);
                 _netStatsService.start();
-                Thread.Sleep(10000);
+                Thread.Sleep(duration*1000);
                 _netStatsService.stop();
                 result.Success = true;
                 result.Message = "Success got NetStats ";
