@@ -11,6 +11,7 @@ using System.Threading;
 using NetworkMonitor.Utils;
 using NetworkMonitor;
 using NetworkMonitor.Objects;
+using NetworkMonitor.Services;
 
 namespace ASPNETCoreScheduler.Scheduler
 {

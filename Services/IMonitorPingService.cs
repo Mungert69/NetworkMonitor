@@ -1,8 +1,9 @@
 ﻿using NetworkMonitor.Data;
+using NetworkMonitor.Objects;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NetworkMonitor.Objects
+namespace NetworkMonitor.Services
 {
     public interface IMonitorPingService
     {

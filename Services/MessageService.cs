@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using MimeKit;
+using NetworkMonitor.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetworkMonitor.Objects
+namespace NetworkMonitor.Services
 {
     public class MessageService : IMessageService
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using NetworkMonitor.Objects;
 
-namespace NetworkMonitor.Objects
+namespace NetworkMonitor.Services
 {
     public interface IMessageService
     {

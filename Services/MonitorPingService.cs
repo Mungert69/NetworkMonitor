@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using NetworkMonitor.Data;
+using NetworkMonitor.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace NetworkMonitor.Objects
+namespace NetworkMonitor.Services
 {
     public class MonitorPingService : IMonitorPingService
     {

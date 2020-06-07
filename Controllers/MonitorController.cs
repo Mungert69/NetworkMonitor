@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
 using NetworkMonitor.Objects;
+using NetworkMonitor.Services;
+using NetworkMonitor.Utils;
 
 namespace NetworkMonitor.Controllers
 {
@@ -19,12 +22,14 @@ namespace NetworkMonitor.Controllers
 
         private readonly ILogger<MonitorController> _logger;
         private readonly IMonitorPingService _monitorPingService;
+        private readonly INetStatsService _netStatsService;
         private MonitorContext _monitorContext;
 
-        public MonitorController(ILogger<MonitorController> logger, IMonitorPingService monitorPingService, MonitorContext monitorContext)
+        public MonitorController(ILogger<MonitorController> logger, IMonitorPingService monitorPingService,INetStatsService netStatsService, MonitorContext monitorContext)
         {
             _logger = logger;
             _monitorPingService = monitorPingService;
+            _netStatsService = netStatsService;
             _monitorContext = monitorContext;
         }
 
@@ -48,6 +53,36 @@ namespace NetworkMonitor.Controllers
             }
             
         }
+
+        [HttpGet("GetNetStats")]
+        public ActionResult<ResultObj> GetNetStats()
+        {
+
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            try
+            {
+              
+                _netStatsService.init(0);
+                _netStatsService.start();
+                Thread.Sleep(10000);
+                _netStatsService.stop();
+                result.Success = true;
+                result.Message = "Success got NetStats ";
+                result.Data = _netStatsService.NetStatData;
+                return result;
+            }
+            catch (Exception e)
+            {
+                result.Data = null;
+                result.Success = false;
+                result.Message = "Failed to get NetStats : Error was : " + e.Message;
+                return result;
+
+            }
+        }
+
+
 
         [HttpGet("GetMointorPingInfosByDataSetID/{dataSetId}")]
         public ActionResult<ResultObj> GetMointorPingInfosByDataSetID([FromRoute] int dataSetId)

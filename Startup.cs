@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
 using NetworkMonitor.Objects;
+using NetworkMonitor.Services;
 
 namespace NetworkMonitor
 {
@@ -33,6 +34,7 @@ namespace NetworkMonitor
             services.AddSingleton<IHostedService, SaveScheduleTask>();
             services.AddSingleton<IHostedService, AlertScheduleTask>();
             services.AddSingleton<IMonitorPingService, MonitorPingService>();
+            services.AddSingleton<INetStatsService, NetStatsService>();
             services.AddSingleton<IMessageService, MailMessageService>();
             services.AddDbContext<MonitorContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
