@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
 using NetworkMonitor.Objects;
@@ -118,7 +120,7 @@ namespace NetworkMonitor.Controllers
 
 
         [HttpGet("GetPingInfosByMonitorPingInfoID/{monitorPingInfoId}/{dataSetId}")]
-        public ActionResult<ResultObj> GetPingInfosByMonitorPingInfoID([FromRoute] int monitorPingInfoId, [FromRoute] int dataSetId)
+        public async Task<ActionResult<ResultObj>> GetPingInfosByMonitorPingInfoID([FromRoute] int monitorPingInfoId, [FromRoute] int dataSetId)
         {
 
             ResultObj result = new ResultObj();
@@ -129,7 +131,7 @@ namespace NetworkMonitor.Controllers
                     result.Data = _monitorPingService.MonitorPingInfos.Where(m => m.ID == monitorPingInfoId).FirstOrDefault().pingInfos.OrderBy(o => o.DateSent).ToList();
                 }
                 else {
-                    result.Data = _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).OrderBy(o => o.DateSent).ToList();
+                    result.Data = await _monitorContext.PingInfos.Where(p => p.MonitorPingInfoID == monitorPingInfoId).OrderBy(o => o.DateSent).ToListAsync();
 
                 }
                  result.Success = true;
@@ -176,9 +178,9 @@ namespace NetworkMonitor.Controllers
 
 
         [HttpGet("SaveData")]
-        public ActionResult<ResultObj> SaveData() {
-            return _monitorPingService.SaveData(_monitorContext);
-           
+        public async Task<ActionResult<ResultObj>> SaveData() {
+            ResultObj result= await _monitorPingService.SaveData(_monitorContext);
+            return result;          
         }
 
     }

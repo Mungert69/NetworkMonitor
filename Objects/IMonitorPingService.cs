@@ -1,5 +1,6 @@
 ﻿using NetworkMonitor.Data;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NetworkMonitor.Objects
 {
@@ -11,6 +12,6 @@ namespace NetworkMonitor.Objects
 
         ResultObj Alert();
         void init(bool initMonitorPingInfos);
-        ResultObj SaveData(MonitorContext monitorContext);
+        Task<ResultObj> SaveData(MonitorContext monitorContext);
     }
 }

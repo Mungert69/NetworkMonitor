@@ -26,7 +26,7 @@ namespace ASPNETCoreScheduler.Scheduler
 
         protected override string Schedule => "0 */1 * * *";
 
-        public override Task ProcessInScope(IServiceProvider serviceProvider)
+        public override  Task ProcessInScope(IServiceProvider serviceProvider)
         {
             Console.WriteLine("Saving data processing starts here");
             try
@@ -35,7 +35,7 @@ namespace ASPNETCoreScheduler.Scheduler
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
                 MonitorContext monitorContext= serviceProvider.GetService<MonitorContext>();
                 updateSchedule(_monitorPingService.PingParams.SaveSchedule);
-                ResultObj result=_monitorPingService.SaveData(monitorContext);
+                ResultObj result=   _monitorPingService.SaveData(monitorContext).Result;
                 Console.Write(result.Message);
             }
             catch (Exception e)

@@ -147,7 +147,7 @@ namespace NetworkMonitor.Objects
             return result;
         }
 
-        public ResultObj SaveData(MonitorContext monitorContext)
+        public async Task<ResultObj> SaveData(MonitorContext monitorContext)
         {
             ResultObj result = new ResultObj();
             result.Success = false;
@@ -170,7 +170,7 @@ namespace NetworkMonitor.Objects
                     monitorPingInfo.DataSetID = maxDataSetID;
                     monitorContext.Add(monitorPingInfo);
                 }
-                monitorContext.SaveChanges();
+                await monitorContext.SaveChangesAsync();
 
                 int i = 0;
                 foreach (MonitorPingInfo monitorPingInfo in monitorContext.MonitorPingInfos.Where(m => m.DataSetID == maxDataSetID).ToList())
@@ -191,7 +191,7 @@ namespace NetworkMonitor.Objects
                     }
                 }
 
-                monitorContext.SaveChanges();
+                await monitorContext.SaveChangesAsync();
                 // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
                 RequestInit = true;
 
