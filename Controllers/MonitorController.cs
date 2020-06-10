@@ -63,10 +63,10 @@ namespace NetworkMonitor.Controllers
             try
             {
                 // Note this api call will start the NetStatService until next SaveSchedule
-                _netStatsService.init(false,deviceId);
-                _netStatsService.start();
-                Thread.Sleep(duration*1000);
-                _netStatsService.stop();
+                //_netStatsService.init(false,deviceId);
+                //_netStatsService.start();
+                //Thread.Sleep(duration*1000);
+                //_netStatsService.stop();
                 result.Success = true;
                 result.Message = "Success got NetStats ";
                 result.Data = _netStatsService.NetStatData;

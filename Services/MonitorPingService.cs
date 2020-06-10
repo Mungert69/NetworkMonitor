@@ -275,8 +275,8 @@ namespace NetworkMonitor.Services
 
                 monitorContext.SaveChanges();
 
-
-                foreach (MonitorPingInfo monitorPingInfo in _monitorPingInfos)
+                List<MonitorPingInfo> monitorPingInfos = new List<MonitorPingInfo>(_monitorPingInfos);
+                foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos)
                 {
                     monitorPingInfo.ID = 0;
                     monitorPingInfo.DataSetID = maxDataSetID;
@@ -285,19 +285,29 @@ namespace NetworkMonitor.Services
                  monitorContext.SaveChanges();
 
                 int i = 0;
+             
+
                 foreach (MonitorPingInfo monitorPingInfo in monitorContext.MonitorPingInfos.Where(m => m.DataSetID == maxDataSetID).ToList())
                 {
-                    _monitorPingInfos[i].ID = monitorPingInfo.ID;
+                    monitorPingInfos[i].ID = monitorPingInfo.ID;
                     i++;
                 }
 
-                List<MonitorPingInfo> monitorPingInfos = new List<MonitorPingInfo>(_monitorPingInfos);
+
                 foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos)
                 {
                     foreach (PingInfo pingInfo in monitorPingInfo.pingInfos)
                     {
                         pingInfo.MonitorPingInfoID = monitorPingInfo.ID;
-                        pingInfo.ID = 0;
+
+                    }
+                }
+
+                foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos)
+                {
+                    foreach (PingInfo pingInfo in monitorPingInfo.pingInfos)
+                    {
+                       
                         monitorContext.Add(pingInfo);
 
                     }
