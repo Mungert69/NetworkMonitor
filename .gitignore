@@ -338,3 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/Deploy/runtimes/win-x64/native
+/Deploy/runtimes/win/lib/netcoreapp2.1
+/Deploy
