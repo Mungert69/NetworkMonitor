@@ -11,8 +11,13 @@ namespace NetworkMonitor.Services
         PingParams PingParams { get; set; }
         bool RequestInit { get; set; }
 
+        void StartNetStats();
+
+        void StopNetStats();
+
         ResultObj Alert();
         void init(bool initMonitorPingInfos);
-        Task<ResultObj> SaveData(MonitorContext monitorContext);
+        Task<ResultObj> SaveDataAsync(MonitorContext monitorContext);
+        ResultObj SaveData(MonitorContext monitorContext);
     }
 }

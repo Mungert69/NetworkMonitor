@@ -19,19 +19,21 @@ namespace NetworkMonitor.Services
         private bool _requestInit = false;
         private IWebHostEnvironment _env = null;
         private string _publicIPAddress;
-        private int _pingAlertThreshold;
         private string[] _monitorIPs;
+
 
 
 
         private List<MonitorPingInfo> _monitorPingInfos = null;
         private IMessageService _mailMessageService;
+        private INetStatsService _netStatsService;
 
-        public MonitorPingService(IConfiguration config, IMessageService mailMessageService, IWebHostEnvironment webHostEnv)
+        public MonitorPingService(IConfiguration config, IMessageService mailMessageService, IWebHostEnvironment webHostEnv, INetStatsService netStatsService)
         {
             _config = config;
             _mailMessageService = mailMessageService;
             _env = webHostEnv;
+            _netStatsService = netStatsService;
             _publicIPAddress = GetPublicIP();
             init(true);
 
@@ -51,8 +53,12 @@ namespace NetworkMonitor.Services
             _pingParams.Schedule = _config.GetValue<string>("PingSchedule");
             _pingParams.SaveSchedule = _config.GetValue<string>("SaveSchedule");
             _pingParams.AlertSchedule = _config.GetValue<string>("AlertSchedule");
-            _pingAlertThreshold = _config.GetValue<int>("PingAlertThreshold");
+            _pingParams.AlertThreshold = _config.GetValue<int>("PingAlertThreshold");
+            _pingParams.DisableNetStatService = _config.GetValue<bool>("DisableNetStatService");
+            _pingParams.LogStatsThreshold = _config.GetValue<int>("LogNetworkStatsThreshold");
+            _pingParams.NetStatsDeviceID = _config.GetValue<int>("NetStatsDeviceID");
 
+            _netStatsService.init(_pingParams.DisableNetStatService,_pingParams.NetStatsDeviceID);
 
             if (initMonitorPingInfos)
             {
@@ -67,7 +73,6 @@ namespace NetworkMonitor.Services
                     monitorPingInfo.IPAddress = _monitorIPs[i];
                     _monitorPingInfos.Add(monitorPingInfo);
                 }
-
             }
             else
             {
@@ -98,6 +103,17 @@ namespace NetworkMonitor.Services
             _requestInit = false;
         }
 
+       
+        public void StartNetStats() {
+            _netStatsService.start();
+        }
+
+        public void StopNetStats() {
+            _netStatsService.stop();
+        }
+
+
+
         public static string GetPublicIP()
         {
             string myPublicIp = "";
@@ -117,7 +133,7 @@ namespace NetworkMonitor.Services
             string alertMessage = "Message from host : " + _publicIPAddress + "\n";
             foreach (MonitorPingInfo monPingInfo in _monitorPingInfos)
             {
-                if (monPingInfo.MonitorStatus.DownCount > _pingAlertThreshold && monPingInfo.MonitorStatus.AlertSent == false)
+                if (monPingInfo.MonitorStatus.DownCount > _pingParams.AlertThreshold && monPingInfo.MonitorStatus.AlertSent == false)
                 {
                     alertMessage += "\nNode ping down " + monPingInfo.MonitorStatus.DownCount +
                         " times. For IP address " + monPingInfo.IPAddress + " Time : " + monPingInfo.MonitorStatus.EventTime;
@@ -148,7 +164,8 @@ namespace NetworkMonitor.Services
             return result;
         }
 
-        public async Task<ResultObj> SaveData(MonitorContext monitorContext)
+       
+        public async Task<ResultObj> SaveDataAsync(MonitorContext monitorContext)
         {
             ResultObj result = new ResultObj();
             result.Success = false;
@@ -159,12 +176,26 @@ namespace NetworkMonitor.Services
             }
             try
             {
+
+
                 int maxDataSetID = 0;
                 try { maxDataSetID = monitorContext.MonitorPingInfos.Max(m => m.DataSetID); }
                 catch { }
 
 
                 maxDataSetID++;
+
+                List<NetStat> netStatsData = new List<NetStat>(_netStatsService.NetStatData);
+                foreach (NetStat netStat in netStatsData)
+                {
+                    //netStat.ID = 0;
+                    netStat.DataSetID = maxDataSetID;
+                    monitorContext.Add(netStat);
+                }
+
+                await monitorContext.SaveChangesAsync();
+
+
                 foreach (MonitorPingInfo monitorPingInfo in _monitorPingInfos)
                 {
                     monitorPingInfo.ID = 0;
@@ -193,8 +224,7 @@ namespace NetworkMonitor.Services
                 }
 
                 await monitorContext.SaveChangesAsync();
-                // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
-                RequestInit = true;
+
 
 
 
@@ -205,11 +235,95 @@ namespace NetworkMonitor.Services
             {
                 result.Message = "DB Update Failed in MonitorPinService.SaveData. Error was : " + e.Message;
             }
+            finally {
+                // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
+                RequestInit = true;
+            }
 
 
             return result;
         }
 
+
+        public ResultObj SaveData(MonitorContext monitorContext)
+        {
+            ResultObj result = new ResultObj();
+            result.Success = false;
+            if (RequestInit == true)
+            {
+                result.Message = "Can not save data an Initialse MonitorPingService is pending. Try again after next ping schedule.";
+                return result;
+            }
+            try
+            {
+
+
+                int maxDataSetID = 0;
+                try { maxDataSetID = monitorContext.MonitorPingInfos.Max(m => m.DataSetID); }
+                catch { }
+
+
+                maxDataSetID++;
+
+                List<NetStat> netStatsData = new List<NetStat>(_netStatsService.NetStatData);
+                foreach (NetStat netStat in netStatsData)
+                {
+                    //netStat.ID = 0;
+                    netStat.DataSetID = maxDataSetID;
+                    monitorContext.Add(netStat);
+                }
+
+                monitorContext.SaveChanges();
+
+
+                foreach (MonitorPingInfo monitorPingInfo in _monitorPingInfos)
+                {
+                    monitorPingInfo.ID = 0;
+                    monitorPingInfo.DataSetID = maxDataSetID;
+                    monitorContext.Add(monitorPingInfo);
+                }
+                 monitorContext.SaveChanges();
+
+                int i = 0;
+                foreach (MonitorPingInfo monitorPingInfo in monitorContext.MonitorPingInfos.Where(m => m.DataSetID == maxDataSetID).ToList())
+                {
+                    _monitorPingInfos[i].ID = monitorPingInfo.ID;
+                    i++;
+                }
+
+                List<MonitorPingInfo> monitorPingInfos = new List<MonitorPingInfo>(_monitorPingInfos);
+                foreach (MonitorPingInfo monitorPingInfo in monitorPingInfos)
+                {
+                    foreach (PingInfo pingInfo in monitorPingInfo.pingInfos)
+                    {
+                        pingInfo.MonitorPingInfoID = monitorPingInfo.ID;
+                        pingInfo.ID = 0;
+                        monitorContext.Add(pingInfo);
+
+                    }
+                }
+
+                monitorContext.SaveChanges();
+
+
+
+
+                result.Message = "DB Update Success in MonitorPinService.SaveData.";
+                result.Success = true;
+            }
+            catch (Exception e)
+            {
+                result.Message = "DB Update Failed in MonitorPinService.SaveData. Error was : " + e.Message;
+            }
+            finally
+            {
+                // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
+                RequestInit = true;
+            }
+
+
+            return result;
+        }
 
         public PingParams PingParams { get => _pingParams; set => _pingParams = value; }
         public bool RequestInit { get => _requestInit; set => _requestInit = value; }

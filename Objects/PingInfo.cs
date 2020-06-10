@@ -1,12 +1,15 @@
 using NetworkMonitor.Objects;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetworkMonitor
 {
     public class PingInfo
     {
-        [Key]public int ID { get; set; }
+        [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int ID { get; set; }
         public DateTime DateSent { get; set; }
 
         public string Status { get; set; }

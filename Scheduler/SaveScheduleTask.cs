@@ -36,7 +36,7 @@ namespace ASPNETCoreScheduler.Scheduler
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
                 MonitorContext monitorContext= serviceProvider.GetService<MonitorContext>();
                 updateSchedule(_monitorPingService.PingParams.SaveSchedule);
-                ResultObj result=   _monitorPingService.SaveData(monitorContext).Result;
+                ResultObj result=   _monitorPingService.SaveData(monitorContext);
                 Console.Write(result.Message);
             }
             catch (Exception e)

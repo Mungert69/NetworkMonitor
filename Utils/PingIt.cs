@@ -13,7 +13,10 @@ namespace NetworkMonitor.Utils
     {
         private MonitorPingInfo _monitorPingInfo;
         private PingParams _pingParams;
+        private int _timeout;
+        private int _roundTrip;
 
+        public int RoundTrip { get => _roundTrip; set => _roundTrip = value; }
 
         public PingIt(MonitorPingInfo pingInfo, PingParams pingParams)
         {
@@ -42,7 +45,7 @@ namespace NetworkMonitor.Utils
           
 
             // Wait 5 seconds for a reply.
-            int timeout = _pingParams.TimeOut;
+            _timeout = _pingParams.TimeOut;
 
             // Set options for transmission:
             // The data can go through 64 gateways or routers
@@ -53,7 +56,7 @@ namespace NetworkMonitor.Utils
             // Send the ping asynchronously.
             // Use the waiter as the user token.
             // When the callback completes, it can wake up this thread.
-            pingSender.SendAsync(who, timeout, buffer, options, waiter);
+            pingSender.SendAsync(who, _timeout, buffer, options, waiter);
 
             // Prevent this example application from ending.
             // A real application should do something useful
@@ -99,9 +102,9 @@ namespace NetworkMonitor.Utils
 
         public  void DisplayReply(PingReply reply)
         {
-            if (reply == null)
-                return;
+
             PingInfo pingInfo = new PingInfo();
+            _roundTrip = -20;
             pingInfo.DateSent = DateTime.Now;
             pingInfo.Status = reply.Status.ToString();
 
@@ -109,16 +112,16 @@ namespace NetworkMonitor.Utils
             if (reply.Status == IPStatus.Success)
             {
                 _monitorPingInfo.PacketsRecieved++;
-                int roundTripTime = (int)reply.RoundtripTime;               
-                pingInfo.RoundTripTime = roundTripTime;
+                _roundTrip = (int)reply.RoundtripTime;               
+                pingInfo.RoundTripTime = _roundTrip;
                 _monitorPingInfo.MonitorStatus.IsUp = true;
                 _monitorPingInfo.MonitorStatus.DownCount=0;
 
 
 
-                if (_monitorPingInfo.RoundTripTimeMaximum < roundTripTime) _monitorPingInfo.RoundTripTimeMaximum = roundTripTime;
-                if (_monitorPingInfo.RoundTripTimeMinimum > roundTripTime) _monitorPingInfo.RoundTripTimeMinimum = roundTripTime;
-                _monitorPingInfo.RoundTripTimeTotal += roundTripTime;
+                if (_monitorPingInfo.RoundTripTimeMaximum < _roundTrip) _monitorPingInfo.RoundTripTimeMaximum = _roundTrip;
+                if (_monitorPingInfo.RoundTripTimeMinimum > _roundTrip) _monitorPingInfo.RoundTripTimeMinimum = _roundTrip;
+                _monitorPingInfo.RoundTripTimeTotal += _roundTrip;
                 _monitorPingInfo.RoundTripTimeAverage = (float)_monitorPingInfo.RoundTripTimeTotal / (float)_monitorPingInfo.PacketsRecieved;
             }
             else { 
@@ -133,7 +136,6 @@ namespace NetworkMonitor.Utils
             if (reply.Status == IPStatus.DestinationHostUnreachable) _monitorPingInfo.DestinationUnreachable++;
             
             _monitorPingInfo.pingInfos.Add(pingInfo);
-
 
         }
     }

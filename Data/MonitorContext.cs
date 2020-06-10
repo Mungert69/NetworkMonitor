@@ -14,12 +14,15 @@ namespace NetworkMonitor.Data
         public DbSet<MonitorPingInfo> MonitorPingInfos{ get; set; }
         public DbSet<PingInfo> PingInfos { get; set; }
 
-      
+        public DbSet<NetStat> NetStats { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<MonitorPingInfo>().ToTable("MonitorPingInfo");
             modelBuilder.Entity<PingInfo>().ToTable("PingInfo");
-           
+            modelBuilder.Entity<NetStat>().ToTable("NetStats");
+
         }
 
 

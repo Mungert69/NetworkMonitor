@@ -16,6 +16,10 @@ namespace NetworkMonitor.Objects
         private string _alertSchedule;
         private int _pingBurstNumber;
         private int _pingBurstDelay;
+        private int _alertThreshold ;
+        private bool _isLogStats ;
+        private int _logStatsThreshold;
+        private int _netStatsDeviceID;
 
         public int BufferLength { get => _bufferLength; set => _bufferLength = value; }
         public int TimeOut { get => _timeOut; set => _timeOut = value; }
@@ -25,5 +29,9 @@ namespace NetworkMonitor.Objects
         public int PingBurstDelay { get => _pingBurstDelay; set => _pingBurstDelay = value; }
         public string SaveSchedule { get => _saveSchedule; set => _saveSchedule = value; }
         public string AlertSchedule { get => _alertSchedule; set => _alertSchedule = value; }
+        public int AlertThreshold { get => _alertThreshold; set => _alertThreshold = value; }
+        public bool DisableNetStatService { get => _isLogStats; set => _isLogStats = value; }
+        public int LogStatsThreshold { get => _logStatsThreshold; set => _logStatsThreshold = value; }
+        public int NetStatsDeviceID { get => _netStatsDeviceID; set => _netStatsDeviceID = value; }
     }
 }

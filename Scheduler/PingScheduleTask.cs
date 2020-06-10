@@ -33,10 +33,11 @@ namespace ASPNETCoreScheduler.Scheduler
                 // Update schedule with string from appsettings.json
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
                 if (_monitorPingService.RequestInit) { _monitorPingService.init(false); }
+                _monitorPingService.StopNetStats();
+                
                 updateSchedule(_monitorPingService.PingParams.Schedule);
                 PingParams pingParams = _monitorPingService.PingParams;
                 PingIt pingIt;
-
 
                 for (int i = 0; i < pingParams.PingBurstNumber; i++)
                 {
@@ -44,6 +45,11 @@ namespace ASPNETCoreScheduler.Scheduler
                     {
                         pingIt = new PingIt(monitorPingInfo, pingParams);
                         pingIt.go();
+                        if (pingIt.RoundTrip > _monitorPingService.PingParams.LogStatsThreshold) {
+
+                            Console.WriteLine("Ping threshold met for IP Address : " + monitorPingInfo.IPAddress+ "  RoundTrip time was : "+ pingIt.RoundTrip);
+                            _monitorPingService.StartNetStats();                                             
+                        }
                         //Console.WriteLine("IP Address : " + monitorPingInfo.IPAddress);
                         //Console.WriteLine("Status : " + monitorPingInfo.MonitorStatus);
                         //Console.WriteLine("Trip Time : " + monitorPingInfo.RoundTripTimeAverage);

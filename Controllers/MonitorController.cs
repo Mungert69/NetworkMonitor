@@ -62,8 +62,8 @@ namespace NetworkMonitor.Controllers
             result.Success = false;
             try
             {
-              
-                _netStatsService.init(deviceId);
+                // Note this api call will start the NetStatService until next SaveSchedule
+                _netStatsService.init(false,deviceId);
                 _netStatsService.start();
                 Thread.Sleep(duration*1000);
                 _netStatsService.stop();
@@ -213,8 +213,8 @@ namespace NetworkMonitor.Controllers
 
 
         [HttpGet("SaveData")]
-        public async Task<ActionResult<ResultObj>> SaveData() {
-            ResultObj result= await _monitorPingService.SaveData(_monitorContext);
+        public ActionResult<ResultObj> SaveData() {
+            ResultObj result= _monitorPingService.SaveData(_monitorContext);
             return result;          
         }
 

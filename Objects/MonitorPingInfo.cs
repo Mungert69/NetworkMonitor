@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,7 +9,9 @@ namespace NetworkMonitor.Objects
 {
     public class MonitorPingInfo
     {
-        [Key]public int ID { get; set; }
+        [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int ID { get; set; }
         private DateTime _dateStarted = DateTime.Now;
         private int _roundTripTimeMinimum = 999;
         private StatusObj _monitorStatus=new StatusObj();

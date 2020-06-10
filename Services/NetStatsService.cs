@@ -8,10 +8,8 @@ using NetworkMonitor.Objects;
 
 namespace NetworkMonitor.Services
 {
-    public class NetStatsService : INetStatsService
+    public class NetStatsService : INetStatsService, IDisposable
     {
-
-
 
         /// <summary>
         /// Stat collection capture example
@@ -24,8 +22,21 @@ namespace NetworkMonitor.Services
         /// 
         private NpcapDevice _device;
         private List<NetStat> _netStatData = new List<NetStat>();
-        public void init(int deviceId)
+        private bool _statsOn;
+        private bool _disable;
+        public void init(bool disable ,int deviceId)
         {
+            _disable = disable;
+
+            if (_disable) {
+
+                Console.WriteLine("NetStatsService is disabled...");
+
+                return;
+            }
+
+            _netStatData = new List<NetStat>();
+           
 
             // Retrieve the device list
             var devices = CaptureDeviceList.Instance;
@@ -33,7 +44,7 @@ namespace NetworkMonitor.Services
             // If no devices were found print an error
             if (devices.Count < 1)
             {
-                Console.WriteLine("No devices were found on this machine");
+                Console.WriteLine("No devices were found on this machine in NetStatsService.init()");
                 return;
             }
 
@@ -82,20 +93,33 @@ namespace NetworkMonitor.Services
 
         public void start()
         {
+            if (_disable) return;
+            if (!_statsOn) { 
             Console.WriteLine();
             Console.WriteLine("-- Gathering statistics on \"{0}\", hit 'Enter' to stop...",
                 _device.Description);
             // Start the capturing process
             _device.StartCapture();
+                _statsOn = true;
+        }
         }
         public void stop()
         {
-            // Stop the capturing process
-            _device.StopCapture();
+            if (_disable) return;
+            if (_statsOn)
+            {
+                // Stop the capturing process
+                _device.StopCapture();
 
-            // Print out the device statistics
-            Console.WriteLine(_device.Statistics.ToString());
+                // Print out the device statistics
+                Console.WriteLine(_device.Statistics.ToString());
 
+               
+                _statsOn = false;
+            }
+        }
+
+        public void Dispose() {
             // Close the pcap device
             _device.Close();
         }
@@ -116,7 +140,13 @@ namespace NetworkMonitor.Services
             ulong delay = (e.Statistics.Timeval.Seconds - oldSec) * 1000000 - oldUsec + e.Statistics.Timeval.MicroSeconds;
 
             // Get the number of Bits per second
-            ulong bps = ((ulong)e.Statistics.RecievedBytes * 8 * 1000000) / delay;
+            ulong bps = 0;
+            if (delay != 0) { 
+           
+
+                bps = ((ulong)e.Statistics.RecievedBytes * 8 * 1000000) / delay;
+            }
+
             /*                                       ^       ^
                                                      |       |
                                                      |       | 
@@ -127,14 +157,18 @@ namespace NetworkMonitor.Services
             */
 
             // Get the number of Packets per second
-            ulong pps = ((ulong)e.Statistics.RecievedPackets * 1000000) / delay;
+            ulong pps = 0;
+            if (delay != 0)
+            {
+                pps = ((ulong)e.Statistics.RecievedPackets * 1000000) / delay;
 
+            }
             // Convert the timestamp to readable format
             var ts = e.Statistics.Timeval.Date.ToLongTimeString();
             var ds = e.Statistics.Timeval.Date.ToLongDateString();
 
             // Print Statistics
-            Console.WriteLine("{0} {1}: bps={2}, pps={3}", ds, ts, bps, pps);
+            //Console.WriteLine("{0} {1}: bps={2}, pps={3}", ds, ts, bps, pps);
             NetStat netStat = new NetStat();
             netStat.ID = 0;
             netStat.statDate = e.Statistics.Timeval.Date;
