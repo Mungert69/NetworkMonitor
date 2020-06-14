@@ -6,8 +6,9 @@ namespace NetworkMonitor.Services
     public interface INetStatsService
     {
         List<NetStat> NetStatData { get; set; }
-        void init(bool disable,int deviceId);
-        void start();
+
+        void Dispose();
+        void start(int deviceId);
         void stop();
     }
 }

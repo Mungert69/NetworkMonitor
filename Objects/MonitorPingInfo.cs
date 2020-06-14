@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace NetworkMonitor.Objects
 {
-    public class MonitorPingInfo
+    public class MonitorPingInfo 
     {
+       
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }

@@ -24,19 +24,10 @@ namespace NetworkMonitor.Services
         private List<NetStat> _netStatData = new List<NetStat>();
         private bool _statsOn;
         private bool _disable;
-        public void init(bool disable ,int deviceId)
+        private void init(int deviceId)
         {
-            _disable = disable;
-
-            if (_disable) {
-
-                Console.WriteLine("NetStatsService is disabled...");
-
-                return;
-            }
 
             _netStatData = new List<NetStat>();
-           
 
             // Retrieve the device list
             var devices = CaptureDeviceList.Instance;
@@ -49,27 +40,7 @@ namespace NetworkMonitor.Services
             }
 
             int i = deviceId;
-            // ToDo find out how to get the right device id
-
-            /*
-            Console.WriteLine();
-                Console.WriteLine("The following devices are available on this machine:");
-                Console.WriteLine("----------------------------------------------------");
-                Console.WriteLine();
-
-              
-           
-
-            //Print out the available devices
-            foreach (var dev in devices)
-                {
-                    Console.WriteLine("{0}) {1} {2}", i, dev.Name, dev.Description);
-                    i++;
-                }
-
-                
-                i = int.Parse(Console.ReadLine());
-            */
+            
 
             _device = devices[i] as NpcapDevice;
 
@@ -91,21 +62,26 @@ namespace NetworkMonitor.Services
 
         }
 
-        public void start()
+        public void start(int deviceId)
         {
-            if (_disable) return;
-            if (!_statsOn) { 
-            Console.WriteLine();
-            Console.WriteLine("-- Gathering statistics on \"{0}\", hit 'Enter' to stop...",
-                _device.Description);
-            // Start the capturing process
-            _device.StartCapture();
+
+
+            if (!_statsOn)
+            {
+                init(deviceId);
+                Console.WriteLine();
+                Console.WriteLine("-- Gathering statistics on \"{0}\", hit 'Enter' to stop...",
+                    _device.Description);
+                // Start the capturing process
+                _device.StartCapture();
                 _statsOn = true;
+
+            }
         }
-        }
+
         public void stop()
         {
-            if (_disable) return;
+
             if (_statsOn)
             {
                 // Stop the capturing process
@@ -113,13 +89,14 @@ namespace NetworkMonitor.Services
 
                 // Print out the device statistics
                 Console.WriteLine(_device.Statistics.ToString());
+                _device.Close();
 
-               
                 _statsOn = false;
             }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             // Close the pcap device
             _device.Close();
         }
@@ -141,8 +118,9 @@ namespace NetworkMonitor.Services
 
             // Get the number of Bits per second
             ulong bps = 0;
-            if (delay != 0) { 
-           
+            if (delay != 0)
+            {
+
 
                 bps = ((ulong)e.Statistics.RecievedBytes * 8 * 1000000) / delay;
             }

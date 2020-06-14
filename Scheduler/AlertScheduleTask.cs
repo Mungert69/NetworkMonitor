@@ -33,7 +33,7 @@ namespace ASPNETCoreScheduler.Scheduler
             try
             {
                 // Update schedule with string from appsettings.json
-                _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
+                _monitorPingService = serviceProvider.GetService<IMonitorPingService>(); 
                 updateSchedule(_monitorPingService.PingParams.AlertSchedule);
                 ResultObj result = _monitorPingService.Alert();
                 Console.Write(result.Message);
