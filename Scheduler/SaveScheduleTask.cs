@@ -25,7 +25,7 @@ namespace ASPNETCoreScheduler.Scheduler
         {
         }
 
-        protected override string Schedule => "*/3 * * * *";
+        protected override string Schedule => "30 */1 * * *";
 
         public override  Task ProcessInScope(IServiceProvider serviceProvider)
         {
@@ -37,7 +37,7 @@ namespace ASPNETCoreScheduler.Scheduler
                 MonitorContext monitorContext= serviceProvider.GetService<MonitorContext>();
                 updateSchedule(_monitorPingService.PingParams.SaveSchedule);
                 ResultObj result=   _monitorPingService.SaveData(monitorContext);
-                Console.Write(result.Message);
+                Console.WriteLine(result.Message);
             }
             catch (Exception e)
             {

@@ -183,10 +183,10 @@ namespace NetworkMonitor.Services
 
             try
             {
-                while (!_isSaving)
+                while (_isSaving)
                 {
                     Console.WriteLine("Waiting for Save in MonitorPingService...");
-                    Thread.Sleep(10000);
+                    Thread.Sleep(1000);
                 }
 
 

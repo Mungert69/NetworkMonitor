@@ -25,24 +25,24 @@ namespace ASPNETCoreScheduler.Scheduler
         {
         }
 
-        protected override string Schedule => "* * * * *";
+        protected override string Schedule => "*/5 * * * *";
 
         public override Task ProcessInScope(IServiceProvider serviceProvider)
         {
-            Console.WriteLine("Alert processing starts here");
+            //Console.WriteLine("Alert processing starts here");
             try
             {
                 // Update schedule with string from appsettings.json
                 _monitorPingService = serviceProvider.GetService<IMonitorPingService>(); 
                 updateSchedule(_monitorPingService.PingParams.AlertSchedule);
                 ResultObj result = _monitorPingService.Alert();
-                Console.Write(result.Message);
+                Console.WriteLine(result.Message);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error occured in AlertScheduleTask.ProcesInScope() : " + e.Message);
             }
-            Console.WriteLine("Alert processing ends here");
+            //Console.WriteLine("Alert processing ends here");
             return Task.CompletedTask;
         }
 

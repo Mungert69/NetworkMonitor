@@ -35,7 +35,7 @@ namespace ASPNETCoreScheduler.Scheduler
                        
                 updateSchedule(_monitorPingService.PingParams.Schedule);
                 ResultObj result = _monitorPingService.Ping();
-                Console.Write(result.Message);
+                Console.WriteLine(result.Message);
                 
 
 
