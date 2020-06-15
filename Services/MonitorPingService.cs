@@ -22,6 +22,7 @@ namespace NetworkMonitor.Services
         private string _publicIPAddress;
         private string[] _monitorIPs;
         private bool _isSaving = false;
+        private bool _isPinging = false;
 
 
 
@@ -135,14 +136,7 @@ namespace NetworkMonitor.Services
              
                 StopNetStats();
 
-                if (_isSaving)
-                {
-                    Console.WriteLine("Aborting MonitorPingService.Ping save in progress ");
-                    result.Message = "Aborting MonitorPingService.Ping save in progress ";
-                    result.Success = false;
-                    return result;
-
-                }
+               
 
                
 
@@ -150,6 +144,17 @@ namespace NetworkMonitor.Services
                 {
                     foreach (MonitorPingInfo monitorPingInfo in _monitorPingInfos)
                     {
+                        // We must abort pinging as soon as possible to stop DB write errors.
+                        if (_isSaving)
+                        {
+                            Console.WriteLine("Aborting MonitorPingService.Ping save in progress ");
+                            result.Message = "Aborting MonitorPingService.Ping save in progress ";
+                            result.Success = false;
+                            _isPinging = false;
+                            return result;
+
+                        }
+                        _isPinging = true;
                         pingIt = new PingIt(monitorPingInfo, pingParams);
                         pingIt.go();
                         if (pingIt.RoundTrip > _pingParams.LogStatsThreshold)
@@ -173,7 +178,9 @@ namespace NetworkMonitor.Services
                 result.Message = "MonitorPingService.Ping Failed : Error was : " + e.Message;
                 result.Success = false;
             }
-            finally { }
+            finally {
+                _isPinging = false;
+            }
             return result;
         }
 
@@ -240,6 +247,11 @@ namespace NetworkMonitor.Services
         public ResultObj SaveData(MonitorContext monitorContext)
         {
             _isSaving = true;
+            while (_isPinging)
+            {
+                Console.WriteLine("Waiting for Ping to stop in MonitorPingService.Save");
+                Thread.Sleep(1000);
+            }
             ResultObj result = new ResultObj();
             result.Success = false;
             Console.WriteLine("Starting MonitorPingService.Save");
@@ -284,6 +296,8 @@ namespace NetworkMonitor.Services
 
                 monitorContext.SaveChanges();
 
+
+                _netStatsService.stop();
                 List<NetStat> netStatsData = new List<NetStat>(_netStatsService.NetStatData);
                 foreach (NetStat netStat in netStatsData)
                 {
