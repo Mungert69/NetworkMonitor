@@ -320,7 +320,7 @@ namespace NetworkMonitor.Services
             {
                 // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
                 init(false);
-                _netStatsService.init(deviceId: _pingParams.NetStatsDeviceID);
+                _netStatsService.resetData();
                 _isSaving = false;
                 Console.WriteLine("Finished MonitorPingService.Save");
             }

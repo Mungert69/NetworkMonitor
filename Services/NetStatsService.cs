@@ -24,10 +24,13 @@ namespace NetworkMonitor.Services
         private List<NetStat> _netStatData = new List<NetStat>();
         private bool _statsOn;
         private bool _disable;
-        public void init(int deviceId)
-        {
 
+
+        public void resetData() {
             _netStatData = new List<NetStat>();
+        }
+        private void init(int deviceId)
+        {
 
             // Retrieve the device list
             var devices = CaptureDeviceList.Instance;

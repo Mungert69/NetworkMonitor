@@ -7,7 +7,7 @@ namespace NetworkMonitor.Services
     {
         List<NetStat> NetStatData { get; set; }
 
-        void init(int deviceId);
+        void resetData();
         void Dispose();
         void start(int deviceId);
         void stop();
