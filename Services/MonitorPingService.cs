@@ -192,7 +192,7 @@ namespace NetworkMonitor.Services
             {
                 while (_isSaving)
                 {
-                    Console.WriteLine("Waiting for Save in MonitorPingService...");
+                    Console.WriteLine("Waiting for Save in MonitorPingService.Alert");
                     Thread.Sleep(1000);
                 }
 
@@ -320,6 +320,7 @@ namespace NetworkMonitor.Services
             {
                 // Make sure the reset of the MonitorPingService Object is run just before the next schedule.
                 init(false);
+                _netStatsService.init(deviceId: _pingParams.NetStatsDeviceID);
                 _isSaving = false;
                 Console.WriteLine("Finished MonitorPingService.Save");
             }

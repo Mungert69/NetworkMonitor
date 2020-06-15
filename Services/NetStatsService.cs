@@ -24,7 +24,7 @@ namespace NetworkMonitor.Services
         private List<NetStat> _netStatData = new List<NetStat>();
         private bool _statsOn;
         private bool _disable;
-        private void init(int deviceId)
+        public void init(int deviceId)
         {
 
             _netStatData = new List<NetStat>();
