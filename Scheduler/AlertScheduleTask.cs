@@ -1,18 +1,9 @@
 ﻿
 using Microsoft.Extensions.DependencyInjection;
+using NetworkMonitor.Objects;
+using NetworkMonitor.Services;
 using System;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading;
-using NetworkMonitor.Utils;
-using NetworkMonitor;
-using NetworkMonitor.Objects;
-using NetworkMonitor.Data;
-using NetworkMonitor.Services;
 
 namespace ASPNETCoreScheduler.Scheduler
 {
@@ -33,7 +24,7 @@ namespace ASPNETCoreScheduler.Scheduler
             try
             {
                 // Update schedule with string from appsettings.json
-                _monitorPingService = serviceProvider.GetService<IMonitorPingService>(); 
+                _monitorPingService = serviceProvider.GetService<IMonitorPingService>();
                 updateSchedule(_monitorPingService.PingParams.AlertSchedule);
                 ResultObj result = _monitorPingService.Alert();
                 Console.WriteLine(result.Message);

@@ -13,7 +13,7 @@ namespace NetworkMonitor
         public DateTime DateSent { get; set; }
 
         public string Status { get; set; }
-     
+
         public int RoundTripTime { get; set; }
 
         public int MonitorPingInfoID { get; set; }

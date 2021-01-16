@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using NetworkMonitor.Objects;
 using SharpPcap;
 using SharpPcap.Npcap;
-using NetworkMonitor.Objects;
+using System;
+using System.Collections.Generic;
 
 namespace NetworkMonitor.Services
 {
@@ -26,14 +24,15 @@ namespace NetworkMonitor.Services
         private bool _disable;
 
 
-        public void resetData() {
+        public void resetData()
+        {
             _netStatData = new List<NetStat>();
         }
         private void init(int deviceId)
         {
 
             // Retrieve the device list
-            var devices = CaptureDeviceList.Instance;
+            CaptureDeviceList devices = CaptureDeviceList.Instance;
 
             // If no devices were found print an error
             if (devices.Count < 1)
@@ -43,7 +42,7 @@ namespace NetworkMonitor.Services
             }
 
             int i = deviceId;
-            
+
 
             _device = devices[i] as NpcapDevice;
 
@@ -145,8 +144,8 @@ namespace NetworkMonitor.Services
 
             }
             // Convert the timestamp to readable format
-            var ts = e.Statistics.Timeval.Date.ToLongTimeString();
-            var ds = e.Statistics.Timeval.Date.ToLongDateString();
+            string ts = e.Statistics.Timeval.Date.ToLongTimeString();
+            string ds = e.Statistics.Timeval.Date.ToLongDateString();
 
             // Print Statistics
             //Console.WriteLine("{0} {1}: bps={2}, pps={3}", ds, ts, bps, pps);

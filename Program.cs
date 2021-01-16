@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
+using System;
 
 namespace NetworkMonitor
 {
@@ -18,7 +15,7 @@ namespace NetworkMonitor
         {
             string[] newArgs = new string[args.Length + 1];
 
-            var config = new ConfigurationBuilder()
+            IConfigurationRoot config = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json", optional: false)
         .Build();
             string urlString = config.GetSection("APIUrl").Value;

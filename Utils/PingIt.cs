@@ -1,11 +1,7 @@
 ﻿using NetworkMonitor.Objects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NetworkMonitor.Utils
 {
@@ -23,13 +19,13 @@ namespace NetworkMonitor.Utils
             _monitorPingInfo = pingInfo;
             _pingParams = pingParams;
             pingInfo.PacketsSent++;
-           
+
         }
 
-       
-        public  void go()
+
+        public void go()
         {
-              string who = _monitorPingInfo.IPAddress;
+            string who = _monitorPingInfo.IPAddress;
             AutoResetEvent waiter = new AutoResetEvent(false);
 
             Ping pingSender = new Ping();
@@ -42,7 +38,7 @@ namespace NetworkMonitor.Utils
 
             byte[] buffer = new byte[_pingParams.BufferLength];
             new Random().NextBytes(buffer);
-          
+
 
             // Wait 5 seconds for a reply.
             _timeout = _pingParams.TimeOut;
@@ -64,7 +60,7 @@ namespace NetworkMonitor.Utils
             waiter.WaitOne();
         }
 
-        private  void PingCompletedCallback(object sender, PingCompletedEventArgs e)
+        private void PingCompletedCallback(object sender, PingCompletedEventArgs e)
         {
             // If the operation was canceled, display a message to the user.
             if (e.Cancelled)
@@ -83,7 +79,7 @@ namespace NetworkMonitor.Utils
             // If an error occurred, display the exception to the user.
             if (e.Error != null)
             {
-                _monitorPingInfo.MonitorStatus.Message = "Ping failed:"+ e.Error.ToString();
+                _monitorPingInfo.MonitorStatus.Message = "Ping failed:" + e.Error.ToString();
                 _monitorPingInfo.MonitorStatus.IsUp = false;
                 _monitorPingInfo.MonitorStatus.DownCount++;
                 _monitorPingInfo.MonitorStatus.EventTime = DateTime.Now;
@@ -100,7 +96,7 @@ namespace NetworkMonitor.Utils
             ((AutoResetEvent)e.UserState).Set();
         }
 
-        public  void DisplayReply(PingReply reply)
+        public void DisplayReply(PingReply reply)
         {
 
             PingInfo pingInfo = new PingInfo();
@@ -108,33 +104,49 @@ namespace NetworkMonitor.Utils
             pingInfo.DateSent = DateTime.Now;
             pingInfo.Status = reply.Status.ToString();
 
-            _monitorPingInfo.MonitorStatus.Message = reply.Status.ToString() ;
+            _monitorPingInfo.MonitorStatus.Message = reply.Status.ToString();
             if (reply.Status == IPStatus.Success)
             {
                 _monitorPingInfo.PacketsRecieved++;
-                _roundTrip = (int)reply.RoundtripTime;               
+                _roundTrip = (int)reply.RoundtripTime;
                 pingInfo.RoundTripTime = _roundTrip;
                 _monitorPingInfo.MonitorStatus.IsUp = true;
-                _monitorPingInfo.MonitorStatus.DownCount=0;
+                _monitorPingInfo.MonitorStatus.DownCount = 0;
 
 
 
-                if (_monitorPingInfo.RoundTripTimeMaximum < _roundTrip) _monitorPingInfo.RoundTripTimeMaximum = _roundTrip;
-                if (_monitorPingInfo.RoundTripTimeMinimum > _roundTrip) _monitorPingInfo.RoundTripTimeMinimum = _roundTrip;
+                if (_monitorPingInfo.RoundTripTimeMaximum < _roundTrip)
+                {
+                    _monitorPingInfo.RoundTripTimeMaximum = _roundTrip;
+                }
+
+                if (_monitorPingInfo.RoundTripTimeMinimum > _roundTrip)
+                {
+                    _monitorPingInfo.RoundTripTimeMinimum = _roundTrip;
+                }
+
                 _monitorPingInfo.RoundTripTimeTotal += _roundTrip;
-                _monitorPingInfo.RoundTripTimeAverage = (float)_monitorPingInfo.RoundTripTimeTotal / (float)_monitorPingInfo.PacketsRecieved;
+                _monitorPingInfo.RoundTripTimeAverage = _monitorPingInfo.RoundTripTimeTotal / (float)_monitorPingInfo.PacketsRecieved;
             }
-            else { 
+            else
+            {
                 _monitorPingInfo.PacketsLost++;
                 _monitorPingInfo.MonitorStatus.IsUp = false;
                 _monitorPingInfo.MonitorStatus.DownCount++;
                 _monitorPingInfo.MonitorStatus.EventTime = pingInfo.DateSent;
                 pingInfo.RoundTripTime = -20;
             }
-            _monitorPingInfo.PacketsLostPercentage = (float)_monitorPingInfo.PacketsLost * (float)100 / (float)_monitorPingInfo.PacketsSent;
-            if (reply.Status == IPStatus.TimedOut) _monitorPingInfo.TimeOuts++;
-            if (reply.Status == IPStatus.DestinationHostUnreachable) _monitorPingInfo.DestinationUnreachable++;
-            
+            _monitorPingInfo.PacketsLostPercentage = _monitorPingInfo.PacketsLost * (float)100 / _monitorPingInfo.PacketsSent;
+            if (reply.Status == IPStatus.TimedOut)
+            {
+                _monitorPingInfo.TimeOuts++;
+            }
+
+            if (reply.Status == IPStatus.DestinationHostUnreachable)
+            {
+                _monitorPingInfo.DestinationUnreachable++;
+            }
+
             _monitorPingInfo.pingInfos.Add(pingInfo);
 
         }

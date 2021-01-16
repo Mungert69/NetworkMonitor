@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NetworkMonitor.Services
 {
@@ -102,12 +101,18 @@ namespace NetworkMonitor.Services
 
         public void StartNetStats()
         {
-            if (!_pingParams.DisableNetStatService) _netStatsService.start(_pingParams.NetStatsDeviceID);
+            if (!_pingParams.DisableNetStatService)
+            {
+                _netStatsService.start(_pingParams.NetStatsDeviceID);
+            }
         }
 
         public void StopNetStats()
         {
-            if (!_pingParams.DisableNetStatService) _netStatsService.stop();
+            if (!_pingParams.DisableNetStatService)
+            {
+                _netStatsService.stop();
+            }
         }
 
 
@@ -133,12 +138,12 @@ namespace NetworkMonitor.Services
                 PingParams pingParams = _pingParams;
                 PingIt pingIt;
 
-             
+
                 StopNetStats();
 
-               
 
-               
+
+
 
                 for (int i = 0; i < pingParams.PingBurstNumber; i++)
                 {
@@ -178,7 +183,8 @@ namespace NetworkMonitor.Services
                 result.Message = "MonitorPingService.Ping Failed : Error was : " + e.Message;
                 result.Success = false;
             }
-            finally {
+            finally
+            {
                 _isPinging = false;
             }
             return result;
@@ -273,8 +279,6 @@ namespace NetworkMonitor.Services
                 }
                 monitorContext.SaveChanges();
 
-                int i = 0;           
-
                 foreach (MonitorPingInfo monitorPingInfo in _monitorPingInfos)
                 {
                     foreach (PingInfo pingInfo in monitorPingInfo.pingInfos)
@@ -331,6 +335,6 @@ namespace NetworkMonitor.Services
 
         public PingParams PingParams { get => _pingParams; set => _pingParams = value; }
         public List<MonitorPingInfo> MonitorPingInfos { get => _monitorPingInfos; set => _monitorPingInfos = value; }
-       
+
     }
 }

@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using MimeKit;
 using NetworkMonitor.Objects;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NetworkMonitor.Services
 {
@@ -18,14 +15,16 @@ namespace NetworkMonitor.Services
             throw new NotImplementedException();
         }
 
-        public void setWebEnv(IWebHostEnvironment env) {
+        public void setWebEnv(IWebHostEnvironment env)
+        {
             _env = env;
         }
 
         public ResultObj send(string messsageBody)
         {
             ResultObj result = new ResultObj();
-            try {
+            try
+            {
                 MimeMessage message = new MimeMessage();
 
                 MailboxAddress from = new MailboxAddress("Mahadeva",
@@ -54,8 +53,9 @@ namespace NetworkMonitor.Services
                 result.Message = "Email sent ok";
                 result.Success = true;
             }
-            catch (Exception e) {
-                result.Message = "Email failed to send . Error was :"+e.Message;
+            catch (Exception e)
+            {
+                result.Message = "Email failed to send . Error was :" + e.Message;
                 result.Success = false;
             }
             return result;

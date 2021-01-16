@@ -6,10 +6,10 @@ namespace NetworkMonitor.Services
 {
     public interface IMonitorPingService
     {
-     
+
         List<MonitorPingInfo> MonitorPingInfos { get; set; }
         PingParams PingParams { get; set; }
-      
+
         ResultObj Alert();
         void init(bool initMonitorPingInfos);
         ResultObj Ping();

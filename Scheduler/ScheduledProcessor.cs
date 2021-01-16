@@ -18,7 +18,8 @@ namespace ASPNETCoreScheduler.Scheduler
             _nextRun = _schedule.GetNextOccurrence(DateTime.Now);
         }
 
-        protected void updateSchedule(string newSchedule) {
+        protected void updateSchedule(string newSchedule)
+        {
             _schedule = CrontabSchedule.Parse(newSchedule);
         }
 
@@ -26,8 +27,8 @@ namespace ASPNETCoreScheduler.Scheduler
         {
             do
             {
-                var now = DateTime.Now;
-                var nextrun = _schedule.GetNextOccurrence(now);
+                DateTime now = DateTime.Now;
+                DateTime nextrun = _schedule.GetNextOccurrence(now);
                 if (now > _nextRun)
                 {
                     await Process();

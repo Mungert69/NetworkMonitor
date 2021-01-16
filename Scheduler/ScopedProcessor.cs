@@ -15,7 +15,7 @@ namespace ASPNETCoreScheduler.BackgroundService
 
         protected override async Task Process()
         {
-            using (var scope = _serviceScopeFactory.CreateScope())
+            using (IServiceScope scope = _serviceScopeFactory.CreateScope())
             {
                 await ProcessInScope(scope.ServiceProvider);
             }

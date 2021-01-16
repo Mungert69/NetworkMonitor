@@ -10,13 +10,16 @@ namespace NetworkMonitor.Data
     {
         public static void Initialize(MonitorContext context)
         {
-            try {
+            try
+            {
                 context.Database.EnsureCreated();
                 context.SaveChanges();
-            } catch (Exception e) {
-                Console.WriteLine("Error occured in DBInitlaizer :"+e.Message);
             }
-           
+            catch (Exception e)
+            {
+                Console.WriteLine("Error occured in DBInitlaizer :" + e.Message);
+            }
+
 
 
         }

@@ -6,12 +6,12 @@ namespace NetworkMonitor.Data
 {
     public class MonitorContext : DbContext
     {
-      
+
         public MonitorContext(DbContextOptions<MonitorContext> options) : base(options)
         {
         }
 
-        public DbSet<MonitorPingInfo> MonitorPingInfos{ get; set; }
+        public DbSet<MonitorPingInfo> MonitorPingInfos { get; set; }
         public DbSet<PingInfo> PingInfos { get; set; }
 
         public DbSet<NetStat> NetStats { get; set; }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NetworkMonitor.Data;
 using NetworkMonitor.Objects;
 using NetworkMonitor.Services;
+using System;
 
 namespace NetworkMonitor.Controllers
 {
@@ -19,10 +15,10 @@ namespace NetworkMonitor.Controllers
         private MonitorContext _monitorContext;
         private readonly ILogger<EmailController> _logger;
 
-        public EmailController(ILogger<EmailController> logger, IMessageService emailService,MonitorContext monitorContext)
+        public EmailController(ILogger<EmailController> logger, IMessageService emailService, MonitorContext monitorContext)
         {
             _logger = logger;
-            _emailService = emailService;        
+            _emailService = emailService;
             _monitorContext = monitorContext;
         }
 
